@@ -20,7 +20,9 @@ import com.googlecode.gwt.charts.client.options.Bar;
 import com.googlecode.gwt.charts.client.options.CoreOptions;
 import com.googlecode.gwt.charts.client.options.FocusTarget;
 import com.googlecode.gwt.charts.client.options.Interval;
+import com.googlecode.gwt.charts.client.options.MaterialBarsOrientation;
 import com.googlecode.gwt.charts.client.options.Orientation;
+import com.googlecode.gwt.charts.client.options.StackedType;
 import com.googlecode.gwt.charts.client.options.Trendline;
 import com.googlecode.gwt.charts.client.options.VAxis;
 import com.googlecode.gwt.charts.client.util.ArrayHelper;
@@ -58,6 +60,15 @@ public class ColumnChartOptions extends CoreOptions {
 	public final native void setBar(Bar bar) /*-{
 		this.bar = bar;
 	}-*/;
+
+	/**
+	 * Sets the bar orientation for material design bars.
+	 * 
+	 * @param materialBarsOrientation an object defining bars orientation
+	 */
+	public final void setBars(MaterialBarsOrientation materialBarsOrientation) {
+		setBars(materialBarsOrientation.getName());
+	}
 
 	/**
 	 * Sets the transparency of data points, with 1.0 being completely opaque and 0.0 fully transparent. In scatter,
@@ -127,6 +138,15 @@ public class ColumnChartOptions extends CoreOptions {
 	public final native void setIsStacked(boolean isStacked) /*-{
 		this.isStacked = isStacked;
 	}-*/;
+
+	/**
+	 * Stacks or unstacks series elements.
+	 * 
+	 * @param isStacked If set to true, series elements are stacked (default: false)
+	 */
+	public final void setIsStacked(StackedType isStacked) {
+		setIsStacked(isStacked.getName());
+	}
 
 	/**
 	 * The orientation of the chart. When set to 'vertical', rotates the axes of the chart so that (for instance) a
@@ -215,6 +235,14 @@ public class ColumnChartOptions extends CoreOptions {
 			this.vAxes = {};
 		}
 		this.vAxes[index] = vAxis;
+	}-*/;
+
+	private final native void setBars(String bars) /*-{
+		this.bars = bars;
+	}-*/;
+
+	private final native void setIsStacked(String isStacked) /*-{
+		this.isStacked = isStacked;
 	}-*/;
 
 	private final native void setFocusTarget(String focusTarget) /*-{

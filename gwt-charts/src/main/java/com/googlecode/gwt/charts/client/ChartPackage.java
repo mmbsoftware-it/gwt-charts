@@ -68,7 +68,11 @@ public enum ChartPackage {
 	/**
 	 * Exclusive use for treemap charts.
 	 */
-	TREEMAP("treemap");
+	TREEMAP("treemap"),
+	/**
+	 * Material design bar charts.
+	 */
+	BAR("bar");
 
 	/**
 	 * Get a ChartPackage by providing its name.

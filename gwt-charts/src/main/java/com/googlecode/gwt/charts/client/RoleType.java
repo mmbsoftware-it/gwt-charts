@@ -83,7 +83,11 @@ public enum RoleType {
 	 * line and area charts, the segment between two data points is in scope if either endpoint is in scope. Data type:
 	 * boolean, where true means in scope. Default: true
 	 */
-	SCOPE("scope");
+	SCOPE("scope"),
+	/**
+	 * To style the chart.
+	 */
+	STYLE("style");
 
 	/**
 	 * Get a RoleType by providing its name.

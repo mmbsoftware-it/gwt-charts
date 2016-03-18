@@ -18,7 +18,6 @@ package com.googlecode.gwt.charts.client.apiloader;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ScriptElement;
-import com.google.gwt.user.client.Window;
 
 import java.util.Vector;
 
@@ -152,8 +151,7 @@ public class ApiLoader {
 		}
 		Document doc = Document.get();
 		String key = (apiKey == null) ? "" : ("key=" + apiKey + "&");
-		String protocol = (Window.Location.getProtocol().equals("https:")) ? "https:" : "http:";
-		String src = protocol + "//" + HOSTNAME + "/jsapi?" + key + "callback=__gwt_charts_AjaxLoader_onLoad";
+		String src = "///" + HOSTNAME + "/jsapi?" + key + "callback=__gwt_charts_AjaxLoader_onLoad";
 		ScriptElement script = doc.createScriptElement();
 		script.setSrc(src);
 		script.setType("text/javascript");

@@ -67,6 +67,15 @@ public abstract class Axis extends JavaScriptObject {
 	}
 
 	/**
+	 * The axis scale type.
+	 * 
+	 * @param scaleType
+	 */
+	public final void setScaleType(AxisScaleType scaleType) {
+		setScaleType(scaleType.getName());
+	}
+
+	/**
 	 * A format string for numeric or date axis labels.
 	 * <p>
 	 * For number axis labels, this is a subset of the decimal formatting ICU pattern set. For instance, "#,###%" will
@@ -251,6 +260,10 @@ public abstract class Axis extends JavaScriptObject {
 
 	private final native void setDirection(int direction) /*-{
 		this.direction = direction;
+	}-*/;
+
+	private final native void setScaleType(String scaleType) /*-{
+		this.scaleType = scaleType;
 	}-*/;
 
 	private final native void setTextPosition(String position) /*-{
