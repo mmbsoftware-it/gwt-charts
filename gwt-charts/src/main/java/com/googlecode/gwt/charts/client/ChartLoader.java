@@ -21,8 +21,7 @@ import com.googlecode.gwt.charts.client.apiloader.ApiLoaderOptions;
  * Utility class for loading the Chart Tools API using the Google Ajax Loader.
  */
 public class ChartLoader {
-	private static final String API_NAME = "visualization";
-	private static final String API_VERSION = "1.1";
+	private static final String API_VERSION = "current";
 
 	private ChartPackage[] packages;
 	private String language;
@@ -81,7 +80,7 @@ public class ChartLoader {
 		if (language != null) {
 			options.setLanguage(language);
 		}
-		ApiLoader.loadApi(API_NAME, version, callback, options);
+		ApiLoader.loadApi(version, callback, options);
 	}
 
 	/**

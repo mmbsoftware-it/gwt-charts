@@ -16,6 +16,7 @@
 package com.googlecode.gwt.charts.client.apiloader;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ScriptElement;
 
@@ -25,19 +26,20 @@ import java.util.Vector;
  * A wrapper for the <a href="https://developers.google.com/loader/">Google Loader/a>.
  */
 public class ApiLoader {
-	private static String HOSTNAME = "www.google.com";
+	private static final int SCHEDULE_DELAY_MS = 10;
+
+	private static String HOSTNAME = "www.gstatic.com";
 
 	/**
 	 * Launches an API load request.
 	 * 
-	 * @param api the name of the API to load
 	 * @param version the API version to load
 	 * @param onLoad a callback that will be invoked when the API is finished
 	 *        loaded. Do not make any calls into the API being loaded until
 	 *        this call returns.
 	 * @param optionalSettings an object containing additional settings.
 	 */
-	public static void loadApi(final String api, final String version, Runnable onLoad,
+	public static void loadApi(final String version, Runnable onLoad,
 			ApiLoaderOptions optionalSettings) {
 		ApiLoader loader = new ApiLoader();
 
@@ -55,7 +57,7 @@ public class ApiLoader {
 
 			@Override
 			public void run() {
-				loadApi(api, version, copyOfSettings);
+				loadApi(version, copyOfSettings);
 			}
 		};
 
@@ -71,8 +73,8 @@ public class ApiLoader {
 	/**
 	 * Wrapper for ApiLoader google.load() native method.
 	 */
-	private static native void loadApi(String api, String version, JavaScriptObject settings) /*-{
-		$wnd.google.load(api, version, settings);
+	private static native void loadApi(String version, JavaScriptObject settings) /*-{
+		$wnd.google.charts.load(version, settings);
 	}-*/;
 
 	// NativeCreateCallback already ran, or someone injected the API outside of
@@ -91,20 +93,10 @@ public class ApiLoader {
 	 * Initialize the API without specifying a key.
 	 */
 	public ApiLoader() {
-		this(null);
-	}
-
-	/**
-	 * Initialize the API with a supplied key value.<br>
-	 * See https://code.google.com/apis/console
-	 * 
-	 * @param apiKey API key value.
-	 */
-	public ApiLoader(String apiKey) {
 		if (initialized == true) {
 			return;
 		}
-		boolean alreadyLoaded = injectJsApi(apiKey);
+		boolean alreadyLoaded = injectJsApi();
 
 		// In IE, the above script can execute immediately if its already in the
 		// cache, so don't touch the loaded variable unless we bypassed loading
@@ -115,47 +107,43 @@ public class ApiLoader {
 		initialized = true;
 	}
 
-	/**
-	 * Creates a function to be registered for a callback after jsapi loads.
-	 */
-	private native boolean createCallback(ApiLoader loader) /*-{
-		if ($wnd['google'] && $wnd.google['load']) {
-			// The API has already been loaded.
-			return true;
-		}
-		$wnd.__gwt_charts_AjaxLoader_onLoad = function() {
-			loader.@com.googlecode.gwt.charts.client.apiloader.ApiLoader::onLoadCallback()();
-		}
-		// The application must wait for a callback.
-		return false;
+	private native boolean isLoaded() /*-{
+		return ($wnd['google'] && $wnd.google['charts'] && $wnd.google.charts['load']);
 	}-*/;
 
 	/**
 	 * Adds a script element to the DOM that loads the API Loader main script "jsapi".
 	 * 
-	 * @param apiKey
-	 *        Optional API key value (pass null to omit the key). See
-	 *        http://code.google.com/apis/ajaxsearch/signup.html
 	 * @returns <code>true</code> if the API has already been loaded. Otherwise,
 	 *          returns <code>false</code>, meaning that the application should
 	 *          wait for a callback.
 	 */
-	private boolean injectJsApi(String apiKey) {
+	private boolean injectJsApi() {
 		if (alreadyInjected) {
 			return true;
 		}
-		boolean alreadyLoaded = createCallback(this);
 		alreadyInjected = true;
-		if (alreadyLoaded) {
+		if (isLoaded()) {
 			return true;
 		}
 		Document doc = Document.get();
-		String key = (apiKey == null) ? "" : ("key=" + apiKey + "&");
-		String src = "///" + HOSTNAME + "/jsapi?" + key + "callback=__gwt_charts_AjaxLoader_onLoad";
+		String src = "https://" + HOSTNAME + "/charts/loader.js";
 		ScriptElement script = doc.createScriptElement();
 		script.setSrc(src);
 		script.setType("text/javascript");
 		doc.getBody().appendChild(script);
+		
+		Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
+			@Override
+			public boolean execute() {
+				if (isLoaded()) {
+					onLoadCallback();
+					return false;
+				}
+				return true;
+			}
+		}, SCHEDULE_DELAY_MS);
+		
 		return false;
 	}
 
